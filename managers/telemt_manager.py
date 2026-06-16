@@ -190,9 +190,23 @@ docker compose version
             
         config_content = re.sub(r'public_port\s*=\s*\d+', f'public_port = {port}', config_content)
         
-        # Remove default hello user
-        config_content = re.sub(r'^hello\s*=\s*".*?"', '', config_content, flags=re.MULTILINE)
-            
+        # Replace the insecure default `hello = 0000…` user with a freshly
+        # generated one. Telemt refuses to start with an empty [access.users]
+        # ("Config error: No users configured") and crash-loops, so we must seed
+        # at least one valid user at install time.
+        default_secret = secrets.token_hex(16)
+        config_content, replaced = re.subn(
+            r'^hello\s*=\s*".*?"\s*$',
+            f'default = "{default_secret}"',
+            config_content, flags=re.MULTILINE)
+        if replaced == 0:
+            # Template no longer ships the `hello` user — ensure the section
+            # still gets a user so the container can start.
+            config_content = re.sub(
+                r'(\[access\.users\][^\n]*\n)',
+                rf'\1default = "{default_secret}"\n',
+                config_content, count=1)
+
         self.ssh.upload_file_sudo(config_content, f"{remote_dir}/config.toml")
         
         # Patch docker-compose.yml with proper port
