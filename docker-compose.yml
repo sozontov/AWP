@@ -2,11 +2,16 @@ version: '3.8'
 
 services:
   amnezia_panel:
-    image: prvtpro/amnezia-panel:1.4.3
+    image: prvtpro/amnezia-panel:1.4.4
     container_name: amnezia_panel
 
     ports:
       - "${APP_PORT:-5000}:5000"
+
+    # Set SECRET_KEY to keep user sessions valid across container recreation.
+    # If unset, the panel persists a generated key to the data volume instead.
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-}
 
     volumes:
       - amnezia_data:/app/data
