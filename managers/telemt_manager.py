@@ -6,6 +6,7 @@ import os
 import secrets
 from datetime import datetime
 from .ssh_manager import SSHManager
+from .paths import resource_path
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +129,20 @@ docker compose version
             raise RuntimeError(f"Failed to install docker compose plugin: {err or out}")
 
     def install_protocol(self, protocol_type='telemt', port='443', tls_emulation=True, tls_domain="", max_connections=0):
+        # Validate caller-supplied values before they are baked into config.toml
+        # and shell commands. These come from the admin UI, but a stray quote,
+        # newline or shell metacharacter would corrupt the TOML or the
+        # `docker compose` invocation, so reject anything unexpected up front.
+        port = str(port)
+        if not re.fullmatch(r'\d+', port) or not (1 <= int(port) <= 65535):
+            raise ValueError(f"Invalid port: {port!r} (expected 1-65535)")
+        if tls_domain and not re.fullmatch(r'[A-Za-z0-9.-]{1,253}', tls_domain):
+            raise ValueError(f"Invalid TLS domain: {tls_domain!r}")
+        if max_connections is None:
+            max_connections = 0
+        if not isinstance(max_connections, int) or max_connections < 0:
+            raise ValueError(f"Invalid max_connections: {max_connections!r}")
+
         results = []
         if not self.check_docker_installed():
             results.append("Installing Docker...")
@@ -140,7 +155,7 @@ docker compose version
         self._ensure_docker_compose()
             
         results.append("Uploading Telemt files...")
-        local_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'protocol_telemt')
+        local_dir = resource_path('protocol_telemt')
         remote_dir = "/opt/amnezia/telemt"
         self.ssh.run_sudo_command(f"mkdir -p {remote_dir}")
         self.ssh.run_sudo_command(f"chmod 755 {remote_dir}")

@@ -28,6 +28,7 @@ from managers.ssh_manager import SSHManager
 from managers.awg_manager import AWGManager
 from managers.xray_manager import XrayManager
 from managers.wireguard_manager import WireGuardManager
+from managers.paths import resource_path
 import telegram_bot as tg_bot
 
 # Configure logging
@@ -120,8 +121,8 @@ def _load_secret_key():
 app.add_middleware(SessionMiddleware, secret_key=_load_secret_key())
 
 # Mount static files & templates
-app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
+app.mount("/static", StaticFiles(directory=resource_path("static")), name="static")
+templates = Jinja2Templates(directory=resource_path("templates"))
 
 
 # ======================== Translations ========================
@@ -129,7 +130,7 @@ TRANSLATIONS = {}
 
 def load_translations():
     global TRANSLATIONS
-    trans_dir = os.path.join(os.path.dirname(__file__), 'translations')
+    trans_dir = resource_path('translations')
     if os.path.exists(trans_dir):
         for f in os.listdir(trans_dir):
             if f.endswith('.json'):
