@@ -1,6 +1,6 @@
 services:
   amnezia_panel:
-    image: ghcr.io/sozontov/awp:1.4.6
+    image: ghcr.io/sozontov/awp:1.4.7
     container_name: amnezia_panel
 
     ports:
