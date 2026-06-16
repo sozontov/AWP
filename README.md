@@ -35,7 +35,7 @@ The use of traffic obfuscation tools may violate the laws of your country. Only 
 - **Educational training in cybersecurity**
 
 > **Nothing in this project constitutes an incitement to violate any applicable laws.**
-![Servers Dashboard](https://raw.githubusercontent.com/PRVTPRO/Amnezia-Web-Panel/refs/heads/main/screen/panel1.png)
+![Servers Dashboard](https://raw.githubusercontent.com/sozontov/AWP/refs/heads/main/screen/panel1.png)
 
 
 ### Additional Sections
@@ -45,7 +45,7 @@ The use of traffic obfuscation tools may violate the laws of your country. Only 
 <br>
 User management interface with permissions and access controls:
 
-![Users Management](https://github.com/PRVTPRO/Amnezia-Web-Panel/blob/main/screen/panel1-2.png)
+![Users Management](https://raw.githubusercontent.com/sozontov/AWP/refs/heads/main/screen/panel1-2.png)
 </details>
 
 <details>
@@ -53,7 +53,7 @@ User management interface with permissions and access controls:
 <br>
 Configuration panel for system parameters and preferences:
 
-![Settings Panel](https://github.com/PRVTPRO/Amnezia-Web-Panel/blob/main/screen/panel1-3.png)
+![Settings Panel](https://raw.githubusercontent.com/sozontov/AWP/refs/heads/main/screen/panel1-3.png)
 </details>
 
 ## 🚀 Key Features
@@ -126,8 +126,8 @@ If you require any custom features not currently available in the panel, **let u
 
 1.  **Clone the repository**:
     ```bash
-    git clone https://github.com/PRVTPRO/Amnezia-Web-Panel.git
-    cd Amnezia-Web-Panel
+    git clone https://github.com/sozontov/AWP.git
+    cd AWP
     ```
 
 2.  **Set up Virtual Environment**:
@@ -152,16 +152,21 @@ The panel will be accessible at `http://localhost:5000`.
 
 ## 📦 Installation Method 2
 
-Download and run the executable file for your system.
-```
-Windows
-Linux
-Mac
-```
+Download and run the executable file for your system from the
+[latest release](https://github.com/sozontov/AWP/releases/latest)
+(Windows, Linux, macOS).
 
 ## 🐳 Docker Image
 
-https://hub.docker.com/r/prvtpro/amnezia-panel
+Published to GitHub Container Registry:
+[`ghcr.io/sozontov/awp`](https://github.com/sozontov/AWP/pkgs/container/awp)
+
+```bash
+git clone https://github.com/sozontov/AWP.git
+cd AWP
+export SECRET_KEY=$(openssl rand -hex 32)   # keep sessions across container recreation
+docker compose up -d
+```
 
 > [!TIP]
 > Set the `SECRET_KEY` environment variable to a long random value so user
