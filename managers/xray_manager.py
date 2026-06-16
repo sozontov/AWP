@@ -5,6 +5,7 @@ import logging
 import base64
 from datetime import datetime
 import urllib.parse
+from . import docker_setup
 
 logger = logging.getLogger(__name__)
 
@@ -104,10 +105,12 @@ class XrayManager:
     # ===================== INSTALLATION =====================
 
     def check_docker_installed(self):
-        out, err, code = self.ssh.run_command("docker --version 2>/dev/null")
-        if code != 0: return False
-        out2, _, code2 = self.ssh.run_command("systemctl is-active docker 2>/dev/null || service docker status 2>/dev/null")
-        return 'active' in out2 or 'running' in out2.lower()
+        """Check if Docker is installed and its daemon is running."""
+        return docker_setup.is_docker_running(self.ssh)
+
+    def install_docker(self):
+        """Install Docker CE on the server (real Docker, not the podman shim)."""
+        return docker_setup.install_docker(self.ssh)
 
     def check_container_running(self):
         out, _, _ = self.ssh.run_sudo_command(
@@ -139,8 +142,11 @@ class XrayManager:
 
         if not self.check_docker_installed():
             results.append("Installing Docker...")
-            # Using same install method as AWGManager or assume it's installed
-            pass
+            self.install_docker()
+            if not self.check_docker_installed():
+                raise RuntimeError(
+                    "Docker installation failed or its daemon is not running. "
+                    "Install Docker on the server and try again.")
 
         results.append("Removing old container if exists...")
         if self.check_protocol_installed():
