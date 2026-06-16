@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   amnezia_panel:
     image: ghcr.io/sozontov/awp:1.4.4
