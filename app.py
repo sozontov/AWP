@@ -71,19 +71,57 @@ async def custom_redoc():
         redoc_js_url="https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js",
         with_google_fonts=False,
     )
-app.add_middleware(SessionMiddleware, secret_key=os.environ.get('SECRET_KEY', secrets.token_hex(32)))
-
-# Mount static files & templates
-app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
-
 if getattr(sys, 'frozen', False):
     application_path = os.path.dirname(sys.executable)
 else:
     application_path = os.path.dirname(__file__)
 
 DATA_FILE = os.path.join(application_path, 'data.json')
-CURRENT_VERSION = "v1.4.3"
+CURRENT_VERSION = "v1.4.4"
+
+
+def _load_secret_key():
+    """Return a stable session secret.
+
+    Priority: explicit SECRET_KEY env var, then a persisted key file next to the
+    data dir. We must NOT fall back to a fresh `secrets.token_hex()` on every
+    boot — that rotates the key on each restart and silently logs every user out
+    (painful under Docker's `restart: unless-stopped`). If nothing exists we
+    generate once and persist it.
+    """
+    env_key = os.environ.get('SECRET_KEY')
+    if env_key:
+        return env_key
+
+    # Prefer the persisted data volume (mounted at /app/data in Docker) so the
+    # key survives container recreation; otherwise sit next to the app.
+    data_dir = os.path.join(application_path, 'data')
+    key_dir = data_dir if os.path.isdir(data_dir) else application_path
+    key_file = os.path.join(key_dir, 'secret_key')
+    try:
+        if os.path.exists(key_file):
+            with open(key_file, 'r', encoding='utf-8') as f:
+                key = f.read().strip()
+                if key:
+                    return key
+        key = secrets.token_hex(32)
+        with open(key_file, 'w', encoding='utf-8') as f:
+            f.write(key)
+        os.chmod(key_file, 0o600)
+        return key
+    except OSError:
+        # Read-only filesystem or similar — fall back to an ephemeral key but
+        # warn, since sessions won't survive a restart.
+        logger.warning("Could not persist SECRET_KEY at %s; sessions will not "
+                       "survive a restart. Set the SECRET_KEY env var to fix.", key_file)
+        return secrets.token_hex(32)
+
+
+app.add_middleware(SessionMiddleware, secret_key=_load_secret_key())
+
+# Mount static files & templates
+app.mount("/static", StaticFiles(directory=os.path.join(os.path.dirname(__file__), "static")), name="static")
+templates = Jinja2Templates(directory=os.path.join(os.path.dirname(__file__), "templates"))
 
 
 # ======================== Translations ========================

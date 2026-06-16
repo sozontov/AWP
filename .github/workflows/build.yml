@@ -39,6 +39,7 @@ jobs:
           --add-data "static:static" \
           --add-data "templates:templates" \
           --add-data "translations:translations" \
+          --add-data "protocol_telemt:protocol_telemt" \
           --hidden-import uvicorn \
           --hidden-import fastapi \
           --clean \
@@ -52,6 +53,7 @@ jobs:
           --add-data "static;static" `
           --add-data "templates;templates" `
           --add-data "translations;translations" `
+          --add-data "protocol_telemt;protocol_telemt" `
           --hidden-import uvicorn `
           --hidden-import fastapi `
           --clean `
@@ -65,6 +67,7 @@ jobs:
           --add-data "static:static" \
           --add-data "templates:templates" \
           --add-data "translations:translations" \
+          --add-data "protocol_telemt:protocol_telemt" \
           --hidden-import uvicorn \
           --hidden-import fastapi \
           --clean \

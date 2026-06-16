@@ -30,6 +30,7 @@ coverage.xml
 
 # User data
 data.json
+secret_key
 .DS_Store
 
 # IDEs
