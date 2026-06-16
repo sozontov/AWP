@@ -10,6 +10,8 @@ import secrets
 import string
 import re
 
+from . import docker_setup
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,13 +36,8 @@ class Socks5Manager:
     # ===================== STATUS =====================
 
     def check_docker_installed(self):
-        out, _, code = self.ssh.run_command("docker --version 2>/dev/null")
-        if code != 0:
-            return False
-        out2, _, _ = self.ssh.run_command(
-            "systemctl is-active docker 2>/dev/null || service docker status 2>/dev/null"
-        )
-        return 'active' in out2 or 'running' in out2.lower()
+        """Check if Docker is installed and its daemon is running."""
+        return docker_setup.is_docker_running(self.ssh)
 
     def check_protocol_installed(self, protocol_type='socks5'):
         out, _, _ = self.ssh.run_sudo_command(

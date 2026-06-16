@@ -10,6 +10,7 @@ Follows the same architecture as awg_manager.py, using:
 
 import json
 import re
+from . import docker_setup
 import secrets
 import logging
 from base64 import b64encode
@@ -66,37 +67,12 @@ class WireGuardManager:
     # ===================== INSTALLATION =====================
 
     def check_docker_installed(self):
-        """Check if Docker is installed and running."""
-        out, err, code = self.ssh.run_command("docker --version 2>/dev/null")
-        if code != 0:
-            return False
-        out2, _, code2 = self.ssh.run_command(
-            "systemctl is-active docker 2>/dev/null || service docker status 2>/dev/null"
-        )
-        return 'active' in out2 or 'running' in out2.lower()
+        """Check if Docker is installed and its daemon is running."""
+        return docker_setup.is_docker_running(self.ssh)
 
     def install_docker(self):
-        """Install Docker on the server."""
-        script = r"""
-if which apt-get > /dev/null 2>&1; then pm=$(which apt-get); silent_inst="-yq install"; check_pkgs="-yq update"; docker_pkg="docker.io"; dist="debian";
-elif which dnf > /dev/null 2>&1; then pm=$(which dnf); silent_inst="-yq install"; check_pkgs="-yq check-update"; docker_pkg="docker"; dist="fedora";
-elif which yum > /dev/null 2>&1; then pm=$(which yum); silent_inst="-y -q install"; check_pkgs="-y -q check-update"; docker_pkg="docker"; dist="centos";
-else echo "Packet manager not found"; exit 1; fi;
-if [ "$dist" = "debian" ]; then export DEBIAN_FRONTEND=noninteractive; fi;
-if ! command -v docker > /dev/null 2>&1; then
-  $pm $check_pkgs; $pm $silent_inst $docker_pkg;
-  sleep 5; systemctl enable --now docker; sleep 5;
-fi;
-if [ "$(systemctl is-active docker)" != "active" ]; then
-  $pm $check_pkgs; $pm $silent_inst $docker_pkg;
-  sleep 5; systemctl start docker; sleep 5;
-fi;
-docker --version
-"""
-        out, err, code = self.ssh.run_sudo_script(script, timeout=180)
-        if code != 0:
-            raise RuntimeError(f"Failed to install Docker: {err}")
-        return out
+        """Install Docker CE on the server (real Docker, not the podman shim)."""
+        return docker_setup.install_docker(self.ssh)
 
     def check_container_running(self):
         """Check if WireGuard container is running."""
