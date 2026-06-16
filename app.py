@@ -1576,6 +1576,38 @@ async def api_check_server(request: Request, server_id: int):
         return JSONResponse({'error': str(e), 'connection': 'failed'}, status_code=500)
 
 
+@app.post('/api/servers/{server_id}/install-docker', tags=["Servers"])
+async def api_install_docker(request: Request, server_id: int):
+    """Install Docker (engine + daemon) on the target server.
+
+    Backs the install wizard's "Install Docker" button, shown when the
+    pre-flight check reports Docker missing. Uses the AWG manager's installer
+    since it drives the distro package manager and starts/enables the daemon
+    (works on RHEL-family hosts where `get.docker.com` leaves it stopped).
+    """
+    if not _check_admin(request):
+        return JSONResponse({'error': 'Forbidden'}, status_code=403)
+    try:
+        data = load_data()
+        if server_id >= len(data['servers']):
+            return JSONResponse({'error': 'Server not found'}, status_code=404)
+        server = data['servers'][server_id]
+        ssh = get_ssh(server)
+        ssh.connect()
+        manager = get_protocol_manager(ssh, 'awg')
+        log = manager.install_docker()
+        installed = manager.check_docker_installed()
+        ssh.disconnect()
+        if not installed:
+            return JSONResponse(
+                {'error': 'Docker was installed but its daemon is not running', 'log': log},
+                status_code=500)
+        return {'status': 'success', 'docker_installed': True, 'log': log}
+    except Exception as e:
+        logger.exception("Error installing Docker")
+        return JSONResponse({'error': str(e)}, status_code=500)
+
+
 @app.post('/api/servers/{server_id}/install', tags=["Protocols"])
 async def api_install_protocol(request: Request, server_id: int, req: InstallProtocolRequest):
     if not _check_admin(request):

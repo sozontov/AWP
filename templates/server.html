@@ -777,6 +777,7 @@
                 html += `<span class="badge badge-success"><span class="badge-dot"></span> ${_('docker_ok')}</span>`;
             } else {
                 html += `<span class="badge badge-warn"><span class="badge-dot"></span> ${_('docker_not_installed')}</span>`;
+                html += ` <button type="button" class="btn btn-secondary btn-sm" id="installDockerBtn" onclick="installDocker()">⬇️ ${_('install_docker')}</button>`;
             }
             badges.innerHTML = html;
             if (data.protocols) {
@@ -824,6 +825,23 @@
             btn.disabled = false;
             text.textContent = _('server_check');
             spinner.classList.add('hidden');
+        }
+    }
+
+    // Install Docker on the server (wizard pre-flight action), then refresh the check.
+    async function installDocker() {
+        const btn = document.getElementById('installDockerBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ ' + _('installing_docker');
+        }
+        try {
+            await apiCall(`/api/servers/${SERVER_ID}/install-docker`, 'POST');
+            showToast(_('docker_install_success'), 'success');
+        } catch (err) {
+            showToast((err && err.message) || _('docker_install_failed'), 'error');
+        } finally {
+            checkServer();
         }
     }
 
