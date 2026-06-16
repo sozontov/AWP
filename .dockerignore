@@ -1,0 +1,32 @@
+# VCS
+.git
+.github
+.gitignore
+
+# Python caches / build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+*.spec
+.pytest_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Local/user data & secrets (never bake into the image)
+data.json
+secret_key
+*.log
+
+# Editor / OS cruft
+.vscode/
+.idea/
+.DS_Store

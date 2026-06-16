@@ -163,6 +163,40 @@ Mac
 
 https://hub.docker.com/r/prvtpro/amnezia-panel
 
+> [!TIP]
+> Set the `SECRET_KEY` environment variable to a long random value so user
+> sessions survive container recreation. If it is left unset the panel persists
+> a generated key to the `data` volume instead.
+
+## 🔄 Updating an Existing Deployment
+
+When running from source (e.g. under `/opt/Amnezia-Web-Panel`):
+
+```bash
+cd /opt/Amnezia-Web-Panel
+git pull
+# then restart the panel service/process
+```
+
+When running via Docker, pull the new image tag and recreate:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+## 📦 Releasing
+
+Pushing a `v*` tag triggers the **Build Binaries** workflow, which builds the
+Linux/Windows/macOS binaries and publishes a GitHub Release:
+
+```bash
+git tag v1.4.4
+git push origin v1.4.4
+```
+
+The Docker image is published separately to the registry referenced in
+`docker-compose.yml`; build and push it under the matching tag.
 
 ### Initial Login
 *   **Username**: `admin`
