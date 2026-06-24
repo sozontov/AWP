@@ -1,6 +1,6 @@
 # Amnezia Web Panel
 
-A modern, high-performance web interface for managing **AmneziaWG**, **Classic WireGuard**, **Xray (XTLS-Reality)**, **Telemt (Telegram MTProxy)**, **AmneziaDNS**, **AdGuard Home** and **SOCKS5** services on remote Ubuntu servers — from a single dashboard. Designed to provide a premium user experience with robust administrative capabilities.
+A modern, high-performance web interface for managing **AmneziaWG 2.0**, **Classic WireGuard**, **Telemt (Telegram MTProxy)**, **AmneziaDNS**, **AdGuard Home** and **SOCKS5** services on remote Ubuntu servers — from a single dashboard. Designed to provide a premium user experience with robust administrative capabilities.
 
 > ### 🔄 Compatibility with Official Amnezia Client
 > 
@@ -59,9 +59,8 @@ Configuration panel for system parameters and preferences:
 ## 🚀 Key Features
 
 *   **⚡ VPN Protocols**:
-    *   **AmneziaWG (AWG / AWG 2.0 / AWG Legacy)**: Advanced WireGuard-based protocol with S3/S4 obfuscation to bypass deep packet inspection (DPI). Three coexisting variants — modern AWG 2.0 with full junk-packet masking, and a legacy variant for older clients.
+    *   **AmneziaWG 2.0**: Advanced WireGuard-based protocol with S3/S4 obfuscation and full junk-packet masking to bypass deep packet inspection (DPI).
     *   **Classic WireGuard**: Standard, high-performance WireGuard protocol for unmatched speed and broad device compatibility with traffic monitoring support.
-    *   **Xray (XTLS-Reality)**: Stealthy protocol that masks VPN traffic as standard HTTPS browsing. Pinned to **Xray-core v26.x**; transparently reads both the **panel layout** (`meta.json` + `clientsTable.json`) and the **native Amnezia client layout** (`xray_*.key` files + `clientsTable`), so a node first installed via the official mobile/desktop app can be attached to the panel without re-installation.
     *   **Telemt (Telegram MTProxy)**: High-performance Telegram MTProxy with TLS emulation and comprehensive management (quotas, IP limits, real-time session tracking). Robust install path that auto-configures Docker's official apt/yum repository when needed.
 *   **🛠 Services**:
     *   **AmneziaDNS**: Internal DNS resolver on a private docker network (`amnezia-dns-net`, IP `172.29.172.254`) to prevent DNS leaks and blockings.
@@ -72,7 +71,7 @@ Configuration panel for system parameters and preferences:
     *   **Live ping indicator** next to each server name — non-blocking TCP-connect probe to the SSH port, runs on the asyncio loop in parallel for all servers.
     *   **Clear server** wipes every Amnezia-related container, image and `/opt/amnezia` directory in a single sudo script — works for any current or future `amnezia-*` protocol.
     *   **Reboot** the server directly from the UI.
-    *   Strictly concurrent protocol status polling — all 9 protocols/services checked in parallel for immediate feedback.
+    *   Strictly concurrent protocol status polling — all protocols/services checked in parallel for immediate feedback.
     *   **Asynchronous Processing**: Resilient, non-blocking background architecture prevents the UI panel from freezing, even if remote endpoints hang.
 *   **🌐 Internationalization (i18n)**:
     *   Full support for **English**, **Russian**, **French**, **Chinese**, and **Persian**.
@@ -110,7 +109,6 @@ If you require any custom features not currently available in the panel, **let u
 * **In-Panel File Editor**: Edit configuration files inside containers directly from the web interface
 * **Backup & Restore nodes/protocols**: Comprehensive backup solutions for nodes and protocols
 * **Protocol Migration**: Seamlessly move protocols between nodes
-* **Xray Self-Steal Mode**: Advanced Xray configuration with self-steal functionality
 * **And much more!**
 
 **Or better yet, contribute!**
