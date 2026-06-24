@@ -36,3 +36,6 @@ secret_key
 # IDEs
 .vscode/
 .idea/
+
+# Local docker compose overrides (per-machine build/run tweaks)
+docker-compose.override.yml
